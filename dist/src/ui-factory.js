@@ -1,5 +1,3 @@
-import { PlayerAPI, UIConfig } from 'bitmovin-player';
-
 import { AdMessageLabel } from 'bitmovin-player-ui/dist/js/framework/components/admessagelabel';
 import { Container } from 'bitmovin-player-ui/dist/js/framework/components/container';
 import { CastToggleButton } from 'bitmovin-player-ui/dist/js/framework/components/casttogglebutton';
@@ -16,44 +14,42 @@ import { UIManager } from 'bitmovin-player-ui/dist/js/framework/uimanager';
 import { VolumeControlButton } from 'bitmovin-player-ui/dist/js/framework/components/volumecontrolbutton';
 import { VolumeToggleButton } from 'bitmovin-player-ui/dist/js/framework/components/volumetogglebutton';
 import { VRToggleButton } from 'bitmovin-player-ui/dist/js/framework/components/vrtogglebutton';
-
-import { UIConditionContext, UIVariant } from 'bitmovin-player-ui/dist/js/framework/uimanager';
-
-export class UIFactory {
-    public static buildUI(player: PlayerAPI, config: UIConfig = {}): UIManager {
-        const conditionList: UIVariant[] = [
+var UIFactory = /** @class */ (function () {
+    function UIFactory() {
+    }
+    UIFactory.buildUI = function (player, config) {
+        if (config === void 0) { config = {}; }
+        var conditionList = [
             {
                 ui: UIFactory.getAdUI(),
-                condition: (context: UIConditionContext) => {
+                condition: function (context) {
                     return context.isAd;
                 }
             },
             {
                 ui: UIFactory.getContentUI(true, true),
-                condition: (context: UIConditionContext): boolean => {
+                condition: function (context) {
                     return context.isMobile && !isFinite(player.getDuration());
                 }
             },
             {
                 ui: UIFactory.getContentUI(false, true),
-                condition: (context: UIConditionContext) => {
+                condition: function (context) {
                     return context.isMobile;
                 }
             },
             {
                 ui: UIFactory.getContentUI(true, false),
-                condition: () => !isFinite(player.getDuration())
+                condition: function () { return !isFinite(player.getDuration()); }
             },
             {
                 ui: UIFactory.getContentUI(false, false),
-                condition: () => isFinite(player.getDuration())
+                condition: function () { return isFinite(player.getDuration()); }
             }
         ];
-
         return new UIManager(player, conditionList, config);
-    }
-
-    private static getAdUI(): UIContainer {
+    };
+    UIFactory.getAdUI = function () {
         return new UIContainer({
             hideDelay: -1,
             components: [
@@ -76,9 +72,8 @@ export class UIFactory {
                 })
             ]
         });
-    }
-
-    private static getContentUI(isLive: boolean, isMobile: boolean): UIContainer {
+    };
+    UIFactory.getContentUI = function (isLive, isMobile) {
         return new UIContainer({
             components: [
                 new PlaybackToggleOverlay(),
@@ -86,30 +81,30 @@ export class UIFactory {
                 UIFactory.getControlBar(isLive, isMobile)
             ]
         });
-    }
-
-    private static getTitleBar(): TitleBar {
+    };
+    UIFactory.getTitleBar = function () {
         return new TitleBar({
             components: [new Spacer(), new CastToggleButton(), new VRToggleButton()]
         });
-    }
-
-    private static getControlBar(isLive: boolean, isMobile: boolean): ControlBar {
+    };
+    UIFactory.getControlBar = function (isLive, isMobile) {
         return new ControlBar({
             components: [
                 new Container({
                     components: [
                         new PlaybackToggleButton(),
-                        new PlaybackTimeLabel({ timeLabelMode: PlaybackTimeLabelMode.CurrentTime }),
-                        ...(isLive
-                            ? [new Spacer()]
-                            : [new SeekBar(), new PlaybackTimeLabel({ timeLabelMode: PlaybackTimeLabelMode.TotalTime })]),
-                        ...(isMobile ? [new VolumeToggleButton()] : [new VolumeControlButton()]),
+                        new PlaybackTimeLabel({ timeLabelMode: PlaybackTimeLabelMode.CurrentTime })
+                    ].concat((isLive
+                        ? [new Spacer()]
+                        : [new SeekBar(), new PlaybackTimeLabel({ timeLabelMode: PlaybackTimeLabelMode.TotalTime })]), (isMobile ? [new VolumeToggleButton()] : [new VolumeControlButton()]), [
                         new FullscreenToggleButton()
-                    ],
+                    ]),
                     cssClasses: ['controlbar-top']
                 })
             ]
         });
-    }
-}
+    };
+    return UIFactory;
+}());
+export { UIFactory };
+//# sourceMappingURL=ui-factory.js.map
